@@ -7,7 +7,7 @@ class Crypt {
 
       console.log(hash);
     } catch (err) {
-      //...
+      console.warn("There was an error.");
     }
   }
 }

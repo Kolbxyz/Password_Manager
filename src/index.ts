@@ -1,3 +1,3 @@
 import { crypt } from './crypt'
 
-crypt.crypt("Hello");
+crypt.crypt("Hello world!");
