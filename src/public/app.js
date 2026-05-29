@@ -778,6 +778,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Simulation states
     const particles = [];
     const foodItems = [];
+    const floatingTexts = [];
     
     // Global properties that can be adjusted dynamically in timeline
     const config = {
@@ -789,12 +790,13 @@ document.addEventListener('DOMContentLoaded', () => {
       supernovaProgress: 0,
       flashWhite: false,
       scaryAnglerMode: false,
+      rave: false,
       soundIntensity: 1
     };
 
     // Helper: spawn particles
     function spawnParticles(x, y, count, speedMultiplier = 1, forceColor = null) {
-      const colors = forceColor ? [forceColor] : ['#ef4444', '#f59e0b', '#d97706', '#b45309', '#ffffff', '#ec4899'];
+      const colors = forceColor ? [forceColor] : ['#ef4444', '#f59e0b', '#d97706', '#b45309', '#ffffff', '#ec4899', '#38bdf8', '#a855f7', '#22c55e'];
       for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = (0.5 + Math.random() * 5) * speedMultiplier;
@@ -813,21 +815,21 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Helper: spawn food item
+    // Helper: spawn food item (with ridiculous additions)
     function spawnFoodItem(x, y, vx, vy, sizeFactor = 1) {
-      const types = ['chicken', 'rooster', 'drumstick', 'nugget', 'kfc_bucket'];
+      const types = ['chicken', 'rooster', 'drumstick', 'nugget', 'kfc_bucket', 'ufo', 'cow', 'banana', 'cat', 'poop', 'fire', 'popcorn', 'unicorn'];
       const type = types[Math.floor(Math.random() * types.length)];
-      const size = (type === 'kfc_bucket' ? 24 : type === 'nugget' ? 16 : 30) * sizeFactor * (0.8 + Math.random() * 0.4);
+      const size = (type === 'kfc_bucket' ? 24 : type === 'nugget' ? 16 : 28) * sizeFactor * (0.8 + Math.random() * 0.4);
       
       foodItems.push({
         x: x,
         y: y,
-        vx: vx || (Math.random() - 0.5) * 6,
-        vy: vy || (Math.random() - 0.5) * 6 - 2,
+        vx: vx || (Math.random() - 0.5) * 7,
+        vy: vy || (Math.random() - 0.5) * 7 - 2,
         type: type,
         size: size,
         rotation: Math.random() * Math.PI * 2,
-        rotationSpeed: (Math.random() - 0.5) * 0.1,
+        rotationSpeed: (Math.random() - 0.5) * 0.15,
         opacity: 1
       });
     }
@@ -838,12 +840,10 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.translate(x, y);
       ctx.rotate(rotation);
       
-      // Shadow
       ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
       ctx.shadowBlur = 6;
       ctx.shadowOffsetY = 3;
 
-      // Bucket body (white trapezoid)
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
       ctx.moveTo(-size, -size);
@@ -855,7 +855,6 @@ document.addEventListener('DOMContentLoaded', () => {
       
       ctx.shadowColor = 'transparent';
 
-      // Red stripes
       ctx.fillStyle = '#e11d48';
       
       // Left stripe
@@ -885,7 +884,6 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.closePath();
       ctx.fill();
 
-      // Top rim (white oval)
       ctx.fillStyle = '#ffffff';
       ctx.strokeStyle = '#e5e7eb';
       ctx.lineWidth = 1;
@@ -894,13 +892,11 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.fill();
       ctx.stroke();
 
-      // Bottom base
       ctx.fillStyle = '#d1d5db';
       ctx.beginPath();
       ctx.ellipse(0, size, size * 0.7, size * 0.12, 0, 0, 2 * Math.PI);
       ctx.fill();
 
-      // Text KFC
       ctx.fillStyle = '#000000';
       ctx.font = `bold ${size * 0.5}px 'Arial Black', sans-serif`;
       ctx.textAlign = 'center';
@@ -916,13 +912,11 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.translate(x, y);
       ctx.rotate(rotation);
 
-      // Shadow
       ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
       ctx.shadowBlur = 4;
       ctx.shadowOffsetY = 2;
 
-      // Nugget lumpy path
-      ctx.fillStyle = '#d97706'; // Golden nugget
+      ctx.fillStyle = '#d97706';
       ctx.beginPath();
       const points = 7;
       const seed = (Math.abs(x + y) % 100) / 100;
@@ -939,8 +933,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       ctx.shadowColor = 'transparent';
 
-      // Texture
-      ctx.fillStyle = '#b45309'; // Darker crust
+      ctx.fillStyle = '#b45309';
       for (let i = 0; i < 2; i++) {
         ctx.beginPath();
         const cx = Math.sin(seed * 20 + i) * size * 0.25;
@@ -949,7 +942,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fill();
       }
 
-      // Highlight
       ctx.fillStyle = '#f59e0b';
       ctx.beginPath();
       ctx.ellipse(-size * 0.25, -size * 0.2, size * 0.25, size * 0.12, Math.PI / 4, 0, Math.PI * 2);
@@ -961,16 +953,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // Spawn initial entities
     const centerX = window.innerWidth / 2;
     const centerY = window.innerHeight / 2;
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 20; i++) {
       spawnFoodItem(
-        centerX + (Math.random() - 0.5) * 300,
-        centerY + (Math.random() - 0.5) * 300
+        centerX + (Math.random() - 0.5) * 400,
+        centerY + (Math.random() - 0.5) * 400
       );
     }
-    spawnParticles(centerX, centerY, 80);
+    spawnParticles(centerX, centerY, 100);
 
     const draw = () => {
-      ctx.fillStyle = config.flashWhite ? 'rgba(255, 255, 255, 0.8)' : 'rgba(2, 2, 5, 0.12)';
+      // Dynamic backgrounds (glitchy rave modes!)
+      let bgFill = 'rgba(2, 2, 5, 0.12)';
+      if (config.flashWhite) {
+        bgFill = 'rgba(255, 255, 255, 0.8)';
+      } else if (config.rave) {
+        const hue = (Date.now() / 4) % 360;
+        bgFill = `hsla(${hue}, 85%, 15%, 0.15)`;
+      }
+      
+      ctx.fillStyle = bgFill;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       if (config.flashWhite) {
@@ -981,14 +982,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const cy = canvas.height / 2;
 
       // Spawn ambient particles
-      if (Math.random() < 0.4) {
+      if (Math.random() < 0.5) {
         if (config.embers) {
           particles.push({
-            x: cx + (Math.random() - 0.5) * 80,
-            y: cy + 100 + Math.random() * 20,
+            x: cx + (Math.random() - 0.5) * 100,
+            y: cy + 120 + Math.random() * 20,
             vx: (Math.random() - 0.5) * 1.5,
             vy: -1 - Math.random() * 2,
-            size: 2 + Math.random() * 3,
+            size: 2 + Math.random() * 4,
             color: '#f97316',
             opacity: 1,
             decay: 0.005 + Math.random() * 0.01,
@@ -996,22 +997,22 @@ document.addEventListener('DOMContentLoaded', () => {
             wind: (Math.random() - 0.5) * 0.05
           });
         } else {
-          spawnParticles(cx, cy, 2);
+          spawnParticles(cx, cy, 3);
         }
       }
 
       // Spawn ambient food items
-      if (foodItems.length < 25 && Math.random() < 0.08) {
+      if (foodItems.length < 35 && Math.random() < 0.12) {
         if (config.embers) {
           foodItems.push({
-            x: cx + (Math.random() - 0.5) * 150,
-            y: cy + 150,
+            x: cx + (Math.random() - 0.5) * 200,
+            y: cy + 180,
             vx: (Math.random() - 0.5) * 1.5,
             vy: -0.5 - Math.random() * 1.5,
-            type: ['chicken', 'rooster', 'drumstick', 'nugget', 'kfc_bucket'][Math.floor(Math.random() * 5)],
+            type: ['chicken', 'rooster', 'drumstick', 'nugget', 'kfc_bucket', 'banana', 'cat'][Math.floor(Math.random() * 7)],
             size: 14 + Math.random() * 10,
             rotation: Math.random() * Math.PI * 2,
-            rotationSpeed: (Math.random() - 0.5) * 0.04,
+            rotationSpeed: (Math.random() - 0.5) * 0.05,
             opacity: 1
           });
         } else {
@@ -1029,10 +1030,10 @@ document.addEventListener('DOMContentLoaded', () => {
           const dist = Math.sqrt(dx * dx + dy * dy) || 1;
           const tx = -dy / dist;
           const ty = dx / dist;
-          p.vx += (dx / dist) * 0.15 + tx * config.vortexSpeed * (dist * 0.02 + 1);
-          p.vy += (dy / dist) * 0.15 + ty * config.vortexSpeed * (dist * 0.02 + 1);
-          p.vx *= 0.95;
-          p.vy *= 0.95;
+          p.vx += (dx / dist) * 0.18 + tx * config.vortexSpeed * (dist * 0.02 + 1);
+          p.vy += (dy / dist) * 0.18 + ty * config.vortexSpeed * (dist * 0.02 + 1);
+          p.vx *= 0.94;
+          p.vy *= 0.94;
         }
 
         p.vy += p.gravity || 0;
@@ -1065,14 +1066,14 @@ document.addEventListener('DOMContentLoaded', () => {
           const tx = -dy / dist;
           const ty = dx / dist;
           
-          item.vx += (dx / dist) * 0.1 + tx * config.vortexSpeed * 3;
-          item.vy += (dy / dist) * 0.1 + ty * config.vortexSpeed * 3;
-          item.vx *= 0.96;
-          item.vy *= 0.96;
+          item.vx += (dx / dist) * 0.12 + tx * config.vortexSpeed * 3.5;
+          item.vy += (dy / dist) * 0.12 + ty * config.vortexSpeed * 3.5;
+          item.vx *= 0.95;
+          item.vy *= 0.95;
         }
 
         if (config.embers) {
-          item.vx += Math.sin(Date.now() * 0.003 + item.y * 0.01) * 0.05;
+          item.vx += Math.sin(Date.now() * 0.003 + item.y * 0.01) * 0.06;
         }
 
         item.x += item.vx;
@@ -1091,7 +1092,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (config.supernova && config.supernovaProgress > 0.8) {
-          item.opacity -= 0.02;
+          item.opacity -= 0.025;
         }
 
         if (item.opacity <= 0) {
@@ -1107,12 +1108,22 @@ document.addEventListener('DOMContentLoaded', () => {
           drawNugget(ctx, item.x, item.y, item.size, item.rotation);
         } else {
           let emojiStr = '🐔';
-          if (item.type === 'rooster') emojiStr = '🐓';
-          else if (item.type === 'drumstick') emojiStr = '🍗';
+          switch (item.type) {
+            case 'rooster': emojiStr = '🐓'; break;
+            case 'drumstick': emojiStr = '🍗'; break;
+            case 'ufo': emojiStr = '🛸'; break;
+            case 'cow': emojiStr = '🐄'; break;
+            case 'banana': emojiStr = '🍌'; break;
+            case 'cat': emojiStr = '🐈'; break;
+            case 'poop': emojiStr = '💩'; break;
+            case 'fire': emojiStr = '🔥'; break;
+            case 'popcorn': emojiStr = '🍿'; break;
+            case 'unicorn': emojiStr = '🦄'; break;
+          }
           
           if (config.scaryAnglerMode && Math.random() < 0.05) {
             emojiStr = '🦈';
-          } else if (config.scaryAnglerMode && item.type === 'chicken') {
+          } else if (config.scaryAnglerMode && (item.type === 'chicken' || item.type === 'cow' || item.type === 'unicorn')) {
             emojiStr = '💀';
           }
           
@@ -1128,6 +1139,38 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       ctx.globalAlpha = 1.0;
 
+      // Update and draw floating boom texts
+      for (let i = floatingTexts.length - 1; i >= 0; i--) {
+        const ft = floatingTexts[i];
+        ft.x += ft.vx;
+        ft.y += ft.vy;
+        ft.rotation += ft.rotationSpeed;
+        ft.opacity -= ft.decay;
+
+        if (ft.opacity <= 0) {
+          floatingTexts.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.translate(ft.x, ft.y);
+        ctx.rotate(ft.rotation);
+        ctx.font = `bold ${ft.size}px 'Arial Black', Impact, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 6;
+        ctx.strokeText(ft.text, 0, 0);
+        
+        ctx.fillStyle = ft.color;
+        ctx.globalAlpha = ft.opacity;
+        ctx.fillText(ft.text, 0, 0);
+        ctx.restore();
+      }
+      ctx.globalAlpha = 1.0;
+
+      // Supernova circle
       if (config.supernova) {
         const radius = config.supernovaProgress * Math.max(canvas.width, canvas.height) * 1.1;
         const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius || 1);
@@ -1162,11 +1205,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const expX = x || canvas.width / 2;
         const expY = y || canvas.height / 2;
         spawnParticles(expX, expY, count, speed, color);
-        for (let i = 0; i < Math.min(count / 10, 8); i++) {
+        for (let i = 0; i < Math.min(count / 8, 12); i++) {
           const angle = Math.random() * Math.PI * 2;
-          const force = 3 + Math.random() * 8;
-          spawnFoodItem(expX, expY, Math.cos(angle) * force, Math.sin(angle) * force, 1.2);
+          const force = 3 + Math.random() * 9;
+          spawnFoodItem(expX, expY, Math.cos(angle) * force, Math.sin(angle) * force, 1.25);
         }
+      },
+      triggerTextExplosion: (text, color = '#f59e0b') => {
+        const words = text.split(' ');
+        words.forEach(w => {
+          floatingTexts.push({
+            text: w.toUpperCase(),
+            x: canvas.width / 2 + (Math.random() - 0.5) * 150,
+            y: canvas.height / 2 + (Math.random() - 0.5) * 100,
+            vx: (Math.random() - 0.5) * 7,
+            vy: (Math.random() - 0.5) * 7 - 3,
+            size: 32 + Math.random() * 28,
+            rotation: (Math.random() - 0.5) * 0.4,
+            rotationSpeed: (Math.random() - 0.5) * 0.06,
+            color: color,
+            opacity: 1,
+            decay: 0.01 + Math.random() * 0.01
+          });
+        });
       },
       setConfig: (key, val) => {
         config[key] = val;
@@ -1187,7 +1248,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     overlay.classList.remove('hidden');
     overlay.style.backgroundColor = '#020205';
-    hudCard.classList.remove('shake-screen');
+    hudCard.className = 'hud-container'; // Reset animations
     
     mainStatus.textContent = 'INITIATING REVOCATION';
     subStatus.textContent = 'Cryptographic revocation protocol started...';
@@ -1213,6 +1274,12 @@ document.addEventListener('DOMContentLoaded', () => {
       miniBar.style.background = color;
     }
 
+    function triggerCardEffect(effectClass) {
+      hudCard.classList.remove('hud-spin', 'hud-flip', 'hud-glitch', 'shake-screen');
+      void hudCard.offsetWidth; // Reflow to reset CSS transition
+      hudCard.classList.add(effectClass);
+    }
+
     updateProgress(0);
     setAccentColor('#ef4444');
 
@@ -1230,179 +1297,196 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- ABSURD 30-SECOND OUTER WILDS & SHADOW OF THE COLOSSUS LOGOUT TIMELINE ---
 
-    // 0.0s: Initiation
+    // 0.0s: Initiation (glitch startup)
     setTimeout(() => { 
       mainStatus.textContent = 'INITIATING REVOCATION';
-      subStatus.textContent = '[SYS] INITIATING CRYPTOGRAPHIC REVOCATION PROTOCOL...'; 
+      subStatus.textContent = 'Initiating cryptographic revocation protocol...'; 
       playSynthSound(880, 'square', 0.15); 
+      triggerCardEffect('hud-glitch');
+      setTimeout(() => hudCard.classList.remove('hud-glitch'), 500);
     }, 100);
 
     // 1.2s: Outer Wilds Lift Off
     setTimeout(() => { 
       mainStatus.textContent = 'LAUNCH SEQUENCE';
-      subStatus.textContent = '[OUTER WILDS] Timber Hearth: Launch codes retrieved from Hornfels. Launching ship...'; 
+      subStatus.textContent = 'Timber Hearth: Launch codes retrieved from Hornfels. Launching ship...'; 
       playSynthSound(100, 'sawtooth', 1.0, true); 
       updateProgress(5);
-      anim.setConfig('gravity', 0.05);
-      anim.triggerExplosion(null, null, 30, 2.5);
+      anim.setConfig('gravity', 0.06);
+      anim.triggerExplosion(null, null, 40, 3);
+      anim.triggerTextExplosion('LIFT OFF BOOM CHICKEN POWER', '#f59e0b');
+      triggerCardEffect('hud-spin');
     }, 1200);
 
     // 2.5s: Shadow of the Colossus: Dormin
     setTimeout(() => { 
       mainStatus.textContent = 'DORMIN ALIGNMENT';
-      subStatus.textContent = '[SHADOW OF THE COLOSSUS] Dormin: "Thy next foe is... Gaius, the third colossus. A giant canopy dreads its shadow..."'; 
+      subStatus.textContent = 'Dormin: "Thy next foe is... Gaius, the third colossus. A giant canopy dreads its shadow..."'; 
       playSynthSound(180, 'triangle', 0.8, true); 
       updateProgress(10);
       setAccentColor('#eab308');
+      anim.triggerTextExplosion('DORMIN AWAKES', '#eab308');
     }, 2500);
 
-    // 4.0s: Outer Wilds: Giant\'s Deep Cyclone
+    // 4.0s: Outer Wilds: Giant\'s Deep Cyclone (glitchy rave!)
     setTimeout(() => { 
       mainStatus.textContent = 'GRAVITY VORTEX';
-      subStatus.textContent = '[OUTER WILDS] Giant\'s Deep: Ship enters atmosphere. Gravity cyclone detected!'; 
-      hudCard.classList.add('shake-screen');
+      subStatus.textContent = 'Giant\'s Deep: Ship enters atmosphere. Gravity cyclone detected!'; 
       playSynthSound(150, 'sawtooth', 1.2, true);
       updateProgress(15);
       anim.setConfig('vortex', true);
-      anim.setConfig('vortexSpeed', 0.03);
+      anim.setConfig('vortexSpeed', 0.04);
+      anim.setConfig('rave', true);
+      anim.triggerTextExplosion('GRAVITY CYCLONE WARNING NONSENSE RAVE', '#ec4899');
+      triggerCardEffect('hud-glitch');
     }, 4000);
 
-    // 5.5s: Shadow of the Colossus: Gaius Sword Jump
+    // 5.5s: Shadow of the Colossus: Gaius Sword Jump (3D card flip)
     setTimeout(() => { 
-      hudCard.classList.remove('shake-screen');
       mainStatus.textContent = 'SWORD JUMP';
-      subStatus.textContent = '[SHADOW OF THE COLOSSUS] Gaius swings stone sword! Wander leaps onto the blade.'; 
-      hudCard.classList.add('shake-screen');
+      subStatus.textContent = 'Gaius swings stone sword! Wander leaps onto the blade.'; 
       playSynthSound(80, 'sawtooth', 1.5, false);
       updateProgress(20);
-      anim.triggerExplosion(null, null, 60, 2);
+      anim.triggerExplosion(null, null, 70, 2);
+      anim.triggerTextExplosion('SWORD JUMP MASSIVE BOOM', '#e11d48');
+      triggerCardEffect('hud-flip');
     }, 5500);
 
-    // 7.5s: Outer Wilds: Dark Bramble Tension
+    // 7.5s: Outer Wilds: Dark Bramble Tension (stop rave/tension silence)
     setTimeout(() => { 
-      hudCard.classList.remove('shake-screen');
       mainStatus.textContent = 'DARK BRAMBLE';
-      subStatus.textContent = '[OUTER WILDS] Dark Bramble: Entering core. Harmonics detected. Dampening thrusters to 0% to avoid Anglerfish...'; 
+      subStatus.textContent = 'Dark Bramble: Entering core. Harmonics detected. Dampening thrusters to 0% to avoid Anglerfish...'; 
       alarmActive = false; // Silence for tension!
       updateProgress(28);
       anim.setConfig('vortex', false);
+      anim.setConfig('rave', false);
       setAccentColor('#0ea5e9');
+      anim.triggerTextExplosion('SILENT BRAIN ANGLERFISH SNEAK', '#0ea5e9');
     }, 7500);
 
-    // 9.5s: Outer Wilds: Anglerfish Attack
+    // 9.5s: Outer Wilds: Anglerfish Attack (intense glitching/shaking & rave back on!)
     setTimeout(() => { 
       mainStatus.textContent = 'ANGLERFISH ATTACK';
-      subStatus.textContent = '[OUTER WILDS] ERROR: Accidental thruster trigger! *CHOMP* - Ship consumed by Anglerfish.'; 
+      subStatus.textContent = 'ERROR: Accidental thruster trigger! *CHOMP* - Ship consumed by Anglerfish.'; 
       playSynthSound(900, 'square', 1.0, false);
-      hudCard.classList.add('shake-screen');
       updateProgress(35);
       anim.setConfig('scaryAnglerMode', true);
-      anim.triggerExplosion(null, null, 80, 4, '#ef4444');
+      anim.setConfig('rave', true);
+      anim.triggerExplosion(null, null, 90, 4.5, '#ef4444');
+      anim.triggerTextExplosion('ANGLER CHOMP DANGER DANGER CHICKENS ESCAPING', '#ef4444');
       setAccentColor('#ef4444');
+      triggerCardEffect('hud-glitch');
     }, 9500);
 
-    // 11.0s: Outer Wilds: Ash Twin Project Mask Active
+    // 11.0s: Outer Wilds: Ash Twin Project Mask Active (time dilation 3D flip)
     setTimeout(() => { 
-      hudCard.classList.remove('shake-screen');
       mainStatus.textContent = 'LOOP RESET';
-      subStatus.textContent = '[OUTER WILDS] Nomai Mask activated. Relaying memory logs... LOOP #9,318,054 CONCLUDED.'; 
+      subStatus.textContent = 'Nomai Mask activated. Relaying memory logs... LOOP #9,318,054 CONCLUDED.'; 
       playSynthSound(440, 'sine', 0.5, true);
       updateProgress(42);
       anim.setConfig('scaryAnglerMode', false);
       anim.setConfig('flashWhite', true);
-      anim.triggerExplosion(null, null, 100, 1.5, '#0ea5e9');
+      anim.triggerExplosion(null, null, 110, 2, '#0ea5e9');
+      anim.triggerTextExplosion('TIME DILATION LOOP SHIFT', '#0ea5e9');
       setAccentColor('#0ea5e9');
+      triggerCardEffect('hud-flip');
     }, 11000);
 
     // 12.5s: Shadow of the Colossus: Gaius Arm Climb
     setTimeout(() => { 
       mainStatus.textContent = 'ARM BRACE CLIMB';
-      subStatus.textContent = '[SHADOW OF THE COLOSSUS] Loop reset. Running up Gaius\' stone arm brace. Grip stamina: 20%!'; 
-      hudCard.classList.add('shake-screen');
+      subStatus.textContent = 'Loop reset. Running up Gaius\' stone arm brace. Grip stamina: 20%!'; 
       playSynthSound(100, 'triangle', 0.6, true);
       updateProgress(48);
+      anim.triggerTextExplosion('CLIMB STAMINA DANGER', '#eab308');
+      triggerCardEffect('shake-screen');
     }, 12500);
 
     // 14.0s: Shadow of the Colossus: First Sigil Struck
     setTimeout(() => { 
-      hudCard.classList.remove('shake-screen');
       mainStatus.textContent = 'SIGIL STRUCK';
-      subStatus.textContent = '[SHADOW OF THE COLOSSUS] Stabbing first glowing sigil on Gaius\' head! Zero-filling bearer tokens.'; 
-      hudCard.classList.add('shake-screen');
+      subStatus.textContent = 'Stabbing first glowing sigil on Gaius\' head! Zero-filling bearer tokens.'; 
       playSynthSound(70, 'sawtooth', 1.5, true);
       updateProgress(55);
-      anim.triggerExplosion(null, null, 70, 2.5, '#ef4444');
+      anim.triggerExplosion(null, null, 80, 2.5, '#ef4444');
+      anim.triggerTextExplosion('SIGIL SHATTERED WIPING TOKENS BOOM', '#ef4444');
       setAccentColor('#ef4444');
+      triggerCardEffect('hud-spin');
     }, 14000);
 
     // 15.5s: Outer Wilds: Quantum Moon Alignment
     setTimeout(() => { 
-      hudCard.classList.remove('shake-screen');
       mainStatus.textContent = 'QUANTUM MOON';
-      subStatus.textContent = '[OUTER WILDS] Quantum Moon landing successful. Solanum meets Wander at the Sixth Location.'; 
+      subStatus.textContent = 'Quantum Moon landing successful. Solanum meets Wander at the Sixth Location.'; 
       playSynthSound(523.25, 'sine', 0.6, true);
       updateProgress(62);
       setAccentColor('#a855f7');
-      anim.triggerExplosion(null, null, 40, 1, '#a855f7');
+      anim.triggerExplosion(null, null, 50, 1.2, '#a855f7');
+      anim.triggerTextExplosion('QUANTUM SOLANUM CONVERGENCE', '#a855f7');
     }, 15500);
 
     // 17.0s: Outer Wilds: Interloper Core
     setTimeout(() => { 
       mainStatus.textContent = 'THE INTERLOPER';
-      subStatus.textContent = '[OUTER WILDS] Navigating ice cracks. Pressurized Ghost Matter detected.'; 
+      subStatus.textContent = 'Navigating ice cracks. Pressurized Ghost Matter detected.'; 
       playSynthSound(1200, 'sine', 0.3, true);
       updateProgress(68);
       setAccentColor('#22c55e');
+      anim.triggerTextExplosion('ICE DEBRIS RADAR', '#22c55e');
     }, 17000);
 
-    // 18.5s: Outer Wilds: Ghost Matter Rupture
+    // 18.5s: Outer Wilds: Ghost Matter Rupture (glitchy toxic rave!)
     setTimeout(() => { 
       mainStatus.textContent = 'GHOST MATTER RUPTURE';
-      subStatus.textContent = '[OUTER WILDS] Ghost matter core ruptured! Lethal energy vaporizing RAM master keys.'; 
-      hudCard.classList.add('shake-screen');
+      subStatus.textContent = 'Ghost matter core ruptured! Lethal energy vaporizing RAM master keys.'; 
       playSynthSound(800, 'sawtooth', 1.0, true);
       updateProgress(75);
-      anim.triggerExplosion(null, null, 95, 2, '#22c55e');
+      anim.triggerExplosion(null, null, 110, 2.2, '#22c55e');
+      anim.triggerTextExplosion('GHOST MATTER DETONATION RADIATION RAVE', '#22c55e');
+      triggerCardEffect('hud-glitch');
     }, 18500);
 
     // 20.0s: Shadow of the Colossus: Dormin Possession
     setTimeout(() => { 
-      hudCard.classList.remove('shake-screen');
       mainStatus.textContent = 'SHADOW POSSESSION';
-      subStatus.textContent = '[SHADOW OF THE COLOSSUS] 16 idols crumbled. Wander possessed by Dormin. Shrine pool pulling Wander in.'; 
+      subStatus.textContent = '16 idols crumbled. Wander possessed by Dormin. Shrine pool pulling Wander in.'; 
       securityBadge.textContent = 'DORMIN ALIGNMENT: 95%';
       playSynthSound(150, 'triangle', 2.0, false);
       updateProgress(82);
       anim.setConfig('vortex', true);
-      anim.setConfig('vortexSpeed', -0.015);
+      anim.setConfig('vortexSpeed', -0.02);
       setAccentColor('#64748b');
+      anim.triggerTextExplosion('SHADOW CONVOCATION VACUUM', '#64748b');
+      triggerCardEffect('hud-flip');
     }, 20000);
 
     // 21.5s: Outer Wilds: Sun Station Collapse Warning
     setTimeout(() => { 
       mainStatus.textContent = 'CORE COLLAPSE DETECTED';
-      subStatus.textContent = '[OUTER WILDS] SUN STATION: Core collapse confirmed. Supernova blast wave in 3 seconds.'; 
+      subStatus.textContent = 'SUN STATION: Core collapse confirmed. Supernova blast wave in 3 seconds.'; 
       securityBadge.textContent = 'SYSTEM LOCKDOWN: SUPERNOVA';
       alarmActive = true;
       playSynthSound(440, 'square', 0.5, true);
       updateProgress(88);
       setAccentColor('#f97316');
+      anim.triggerTextExplosion('SUPERNOVA COUNTDOWN WARNING', '#f97316');
+      triggerCardEffect('hud-glitch');
     }, 21500);
 
     // 23.0s: Shadow of the Colossus: Final Defeat / agro memorial
     setTimeout(() => { 
       mainStatus.textContent = 'VALEDICTORY';
-      subStatus.textContent = '[SHADOW OF THE COLOSSUS] Wander lets go. "Agro..." echoes. Ending SQLite db sync...'; 
-      hudCard.classList.add('shake-screen');
+      subStatus.textContent = 'Wander lets go. "Agro..." echoes. Ending SQLite db sync...'; 
       playSynthSound(90, 'sawtooth', 1.5, true);
       updateProgress(92);
+      anim.triggerTextExplosion('AGRO ECO MEMORY PURGE', '#f43f5e');
+      triggerCardEffect('shake-screen');
     }, 23000);
 
-    // 24.5s: Outer Wilds: Supernova
+    // 24.5s: Outer Wilds: Supernova (giant explosion)
     setTimeout(() => { 
-      hudCard.classList.remove('shake-screen');
       mainStatus.textContent = 'SUPERNOVA DETONATION';
-      subStatus.textContent = '[OUTER WILDS] SUN STATION: SUPERNOVA BURST IGNITED. Evaporating local filesystem...'; 
+      subStatus.textContent = 'SUN STATION: SUPERNOVA BURST IGNITED. Evaporating local filesystem...'; 
       securityBadge.textContent = 'SYSTEM STATUS: SUPERNOVA';
       overlay.style.backgroundColor = '#020617';
       playSynthSound(100, 'sawtooth', 3.0, false);
@@ -1420,15 +1504,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 16);
 
       setAccentColor('#ffffff');
+      anim.triggerTextExplosion('APOCALYPSE SUPERNOVA KA BOOM NONSENSE OVERLOAD', '#ffffff');
+      triggerCardEffect('hud-flip');
     }, 24500);
 
-    // 26.5s: Outer Wilds: Ash Twin project mask receipt
+    // 26.5s: Outer Wilds: Ash Twin project mask receipt (calm campfire)
     setTimeout(() => { 
       mainStatus.textContent = 'LOOP SECURED';
-      subStatus.textContent = '[OUTER WILDS] Memories transmitted. Gathering around the campfire. Tuning instruments...'; 
+      subStatus.textContent = 'Memories transmitted. Gathering around the campfire. Tuning instruments...'; 
       clearInterval(alertInterval);
       alarmActive = false;
-      hudCard.classList.remove('shake-screen');
       overlay.style.backgroundColor = '#0c0a09';
       
       securityBadge.style.color = '#22c55e';
@@ -1439,8 +1524,11 @@ document.addEventListener('DOMContentLoaded', () => {
       
       anim.setConfig('supernova', false);
       anim.setConfig('vortex', false);
+      anim.setConfig('rave', false);
       anim.setConfig('embers', true);
       setAccentColor('#f97316');
+      
+      anim.triggerTextExplosion('CAMPFIRE PEACE REST LOOP CLOSED', '#f97316');
 
       const banjoNotes = [
         { freq: 587.33, delay: 0 },
@@ -1462,9 +1550,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // 28.5s: Completion
     setTimeout(() => { 
       mainStatus.textContent = 'MEMORIES STORED';
-      subStatus.textContent = '[SUCCESS] Vault locked. Loop #9,318,055 initialized. Memory cleared safely.'; 
+      subStatus.textContent = 'Vault locked. Loop #9,318,055 initialized. Memory cleared safely.'; 
       updateProgress(100);
       setAccentColor('#22c55e');
+      anim.triggerTextExplosion('GOODBYE SECURE SAFE', '#22c55e');
     }, 28500);
 
     // 30.5s: Redirect

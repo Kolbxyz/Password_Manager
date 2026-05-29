@@ -1292,6 +1292,36 @@ input[type="range"]::-webkit-slider-thumb:hover {
   animation: shake 0.1s infinite;
 }
 
+.hud-spin {
+  animation: hud-spin-anim 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hud-flip {
+  animation: hud-flip-anim 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hud-glitch {
+  animation: hud-glitch-anim 0.15s infinite;
+}
+
+@keyframes hud-spin-anim {
+  0% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(0.8) rotate(180deg); }
+  100% { transform: scale(1) rotate(360deg); }
+}
+
+@keyframes hud-flip-anim {
+  0% { transform: scale(1) rotateY(0deg) rotateX(0deg); }
+  50% { transform: scale(1.2) rotateY(180deg) rotateX(180deg); }
+  100% { transform: scale(1) rotateY(360deg) rotateX(360deg); }
+}
+
+@keyframes hud-glitch-anim {
+  0% { transform: translate(3px, -3px) skew(3deg); filter: hue-rotate(90deg) contrast(1.5); }
+  50% { transform: translate(-3px, 3px) skew(-3deg); filter: hue-rotate(270deg) contrast(2); }
+  100% { transform: translate(0, 0) skew(0); filter: hue-rotate(0deg); }
+}
+
 @keyframes pulse {
   from { opacity: 0.5; }
   to { opacity: 1; }
