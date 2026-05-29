@@ -1,9 +1,22 @@
 {
+  "name": "password-manager",
+  "version": "1.0.0",
+  "description": "Sleek local password manager inspired by Goonwarden.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc && cp -r src/public dist/",
+    "start": "node dist/index.js",
+    "dev": "tsc && cp -r src/public dist/ && node dist/index.js"
+  },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
     "@types/node": "^25.0.10",
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "argon2": "^0.44.0"
+    "argon2": "^0.44.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
   }
 }

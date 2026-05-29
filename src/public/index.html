@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Goonwarden Vault - Local Enterprise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-mode">
+  <div id="toast-container"></div>
+
+  <!-- Authentication Screen (Flat Sign In / Sign Up) -->
+  <div id="auth-screen" class="screen">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <h1 id="auth-title">Sign In to Vault</h1>
+      </div>
+      
+      <form id="auth-form">
+        <div class="form-group">
+          <label for="auth-username">Username</label>
+          <input type="text" id="auth-username" required placeholder="Enter username">
+        </div>
+        <div class="form-group">
+          <label for="auth-password">Master Password</label>
+          <input type="password" id="auth-password" required placeholder="Enter master password">
+        </div>
+        <div class="form-group hidden" id="register-confirm-group">
+          <label for="auth-confirm">Confirm Master Password</label>
+          <input type="password" id="auth-confirm" placeholder="Confirm master password">
+        </div>
+        <button type="submit" id="btn-auth-submit" class="btn btn-primary btn-block">Sign In</button>
+      </form>
+
+      <div class="auth-toggle-wrapper">
+        <span id="auth-toggle-text">Don't have a local vault account?</span>
+        <button id="btn-auth-toggle" class="link-btn">Create Account</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Screen -->
+  <div id="dashboard-screen" class="screen hidden">
+    <header class="app-header">
+      <div class="header-brand">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span>Goonwarden</span>
+        <span class="badge badge-accent">Local Vault</span>
+      </div>
+      <div class="header-user-info">
+        <span class="user-display" id="user-display">admin</span>
+        <button id="btn-logout" class="btn btn-outline btn-sm">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Log Out
+        </button>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <!-- Sidebar / Navigation -->
+      <aside class="app-sidebar">
+        <button id="btn-new-item" class="btn btn-primary btn-block">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Add Item
+        </button>
+
+        <nav class="sidebar-nav">
+          <button class="nav-item active" data-filter="all">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="9"></rect>
+              <rect x="14" y="3" width="7" height="5"></rect>
+              <rect x="14" y="12" width="7" height="9"></rect>
+              <rect x="3" y="16" width="7" height="5"></rect>
+            </svg>
+            All Items
+          </button>
+          
+          <button class="nav-item" data-filter="favorites">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            Favorites
+          </button>
+
+          <button class="nav-item" data-filter="logins">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            Logins
+          </button>
+          <button class="nav-item" data-filter="notes">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            Secure Notes
+          </button>
+
+          <div class="sidebar-header">Folders</div>
+          <button class="nav-item nav-folder" data-folder="Work">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+            Work
+          </button>
+          <button class="nav-item nav-folder" data-folder="Personal">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+            Personal
+          </button>
+          <button class="nav-item nav-folder" data-folder="Social">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+            Social
+          </button>
+          <button class="nav-item nav-folder" data-folder="Finance">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+            Finance
+          </button>
+
+          <div class="sidebar-header">Tools</div>
+          <button class="nav-item" data-filter="generator">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            Generator
+          </button>
+          
+          <button class="nav-item" data-filter="audit">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            Security Audit
+          </button>
+
+          <button class="nav-item" data-filter="settings">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            Settings
+          </button>
+        </nav>
+      </aside>
+
+      <!-- Main Column: List View -->
+      <main class="app-main">
+        <div class="search-bar-container">
+          <div class="search-input-wrapper">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" class="search-icon">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="search-input" placeholder="Search vault...">
+          </div>
+        </div>
+
+        <div id="entries-list" class="entries-list">
+          <div class="empty-state">
+            <p>Your vault is empty</p>
+          </div>
+        </div>
+      </main>
+
+      <!-- Right Column: Detail / Edit / Settings / Generator View -->
+      <section class="app-detail" id="detail-panel">
+        <div id="detail-welcome" class="detail-container welcome-container">
+          <svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <h2>Vault Dashboard</h2>
+          <p>Create credentials or select an existing entry to view details.</p>
+        </div>
+
+        <!-- Detail Mode Container -->
+        <div id="detail-content" class="detail-container hidden">
+          <div class="detail-header">
+            <div class="title-with-fav">
+              <h2 id="detail-title">Login Credentials</h2>
+              <button id="btn-toggle-favorite" class="btn-fav-star" title="Toggle Favorite">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+              </button>
+            </div>
+            <div class="detail-actions">
+              <button id="btn-edit" class="btn btn-outline btn-sm">Edit</button>
+              <button id="btn-delete" class="btn btn-danger btn-sm">Delete</button>
+            </div>
+          </div>
+
+          <div class="detail-fields">
+            <div class="detail-field-group">
+              <span class="detail-label">Service Name</span>
+              <div class="detail-val-row">
+                <span class="detail-value text-bold" id="val-service">Gmail</span>
+              </div>
+            </div>
+
+            <div class="detail-field-group">
+              <span class="detail-label">Folder</span>
+              <div class="detail-val-row">
+                <span class="detail-value" id="val-folder">-</span>
+              </div>
+            </div>
+
+            <div class="detail-field-group">
+              <span class="detail-label">Username</span>
+              <div class="detail-val-row">
+                <span class="detail-value" id="val-username">user@gmail.com</span>
+                <button class="btn-copy" data-copy="val-username" title="Copy username">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="detail-field-group">
+              <span class="detail-label">Password</span>
+              <div class="detail-val-row">
+                <span class="detail-value password-masked" id="val-password">••••••••••••</span>
+                <div class="action-buttons">
+                  <button class="btn-toggle-pass" id="btn-toggle-view-pass" title="Show password">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </button>
+                  <button class="btn-copy" data-copy="val-password" title="Copy password">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- TOTP Display Block -->
+            <div class="detail-field-group hidden" id="val-totp-group">
+              <span class="detail-label">Verification Code (TOTP)</span>
+              <div class="detail-val-row totp-row">
+                <div class="totp-code-display">
+                  <span class="detail-value text-bold" id="val-totp-code">000 000</span>
+                  <div class="totp-progress-ring-wrapper">
+                    <span id="totp-progress-text">30</span>
+                  </div>
+                </div>
+                <button class="btn-copy" data-copy="val-totp-code" title="Copy verification code">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="detail-field-group">
+              <span class="detail-label">Website URL</span>
+              <div class="detail-val-row">
+                <span class="detail-value" id="val-website">-</span>
+                <div class="action-buttons">
+                  <a href="#" id="link-website" target="_blank" class="btn-visit hidden" title="Go to website">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  </a>
+                  <button class="btn-copy" data-copy="val-website" title="Copy website link">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-field-group">
+              <span class="detail-label">Notes</span>
+              <div class="detail-notes-box" id="val-notes">No notes.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add / Edit Form Container -->
+        <div id="form-content" class="detail-container hidden">
+          <h2 id="form-title">Add Item</h2>
+          
+          <form id="vault-form">
+            <input type="hidden" id="form-id">
+            
+            <div class="form-group">
+              <label for="form-service">Service Name *</label>
+              <input type="text" id="form-service" required placeholder="e.g. Github, Gmail">
+            </div>
+
+            <div class="form-group">
+              <label for="form-folder">Folder</label>
+              <select id="form-folder" class="select-input">
+                <option value="">None</option>
+                <option value="Work">Work</option>
+                <option value="Personal">Personal</option>
+                <option value="Social">Social</option>
+                <option value="Finance">Finance</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="form-username">Username *</label>
+              <input type="text" id="form-username" required placeholder="Username or Email">
+            </div>
+
+            <div class="form-group">
+              <div class="label-row">
+                <label for="form-password">Password</label>
+                <button type="button" id="btn-generate-fill" class="link-btn">Generate</button>
+              </div>
+              <div class="input-action-wrapper">
+                <input type="password" id="form-password" placeholder="Password">
+                <button type="button" id="btn-form-toggle-pass" class="btn-icon-inside">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="form-totp">TOTP Authenticator Key (Base32 Key)</label>
+              <input type="text" id="form-totp" placeholder="e.g. JBSW43DPEHPK3PXP">
+            </div>
+
+            <div class="form-group">
+              <label for="form-website">Website URL</label>
+              <input type="url" id="form-website" placeholder="https://example.com">
+            </div>
+
+            <div class="form-group">
+              <label for="form-notes">Notes</label>
+              <textarea id="form-notes" rows="4" placeholder="Enter secure notes..."></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" id="btn-cancel" class="btn btn-outline">Cancel</button>
+              <button type="submit" id="btn-save" class="btn btn-primary">Save</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Password Generator Container -->
+        <div id="generator-content" class="detail-container hidden">
+          <h2>Password Generator</h2>
+          <p class="section-subtitle">Generate strong random passwords locally in your browser.</p>
+
+          <div class="generator-result-wrapper">
+            <input type="text" id="gen-result" readonly value="Click Generate">
+            <button id="btn-gen-copy" class="btn btn-primary" title="Copy Generated Password">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </button>
+          </div>
+
+          <div class="generator-options">
+            <div class="form-group">
+              <div class="option-slider-header">
+                <label for="gen-length">Length</label>
+                <span id="gen-length-val">16</span>
+              </div>
+              <input type="range" id="gen-length" min="8" max="64" value="16">
+            </div>
+
+            <div class="option-checkbox-group">
+              <label class="checkbox-container">
+                <input type="checkbox" id="gen-upper" checked>
+                <span class="checkmark"></span>
+                A-Z Uppercase Letters
+              </label>
+            </div>
+
+            <div class="option-checkbox-group">
+              <label class="checkbox-container">
+                <input type="checkbox" id="gen-lower" checked>
+                <span class="checkmark"></span>
+                a-z Lowercase Letters
+              </label>
+            </div>
+
+            <div class="option-checkbox-group">
+              <label class="checkbox-container">
+                <input type="checkbox" id="gen-numbers" checked>
+                <span class="checkmark"></span>
+                0-9 Numbers
+              </label>
+            </div>
+
+            <div class="option-checkbox-group">
+              <label class="checkbox-container">
+                <input type="checkbox" id="gen-symbols" checked>
+                <span class="checkmark"></span>
+                !@#$%^&* Special Characters
+              </label>
+            </div>
+
+            <button id="btn-generate-trigger" class="btn btn-outline btn-block" style="margin-top: 1.5rem;">Generate Password</button>
+          </div>
+        </div>
+
+        <!-- Settings Container -->
+        <div id="settings-content" class="detail-container hidden">
+          <h2>Vault Settings</h2>
+          <p class="section-subtitle">Configure your local vault account settings and options.</p>
+
+          <!-- Import/Export section -->
+          <div class="settings-section">
+            <h3>Import & Export Vault Data</h3>
+            <p class="settings-desc">Backup your local vault credentials or import existing ones using JSON files.</p>
+            <div class="settings-actions-row">
+              <button id="btn-export-vault" class="btn btn-outline">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                Export JSON Backup
+              </button>
+              
+              <div class="import-wrapper">
+                <input type="file" id="import-file-selector" accept=".json" class="hidden">
+                <button id="btn-import-vault" class="btn btn-outline">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  Import JSON Backup
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h3>Change Master Password</h3>
+            <form id="change-password-form">
+              <div class="form-group">
+                <label for="settings-current-pass">Current Master Password</label>
+                <input type="password" id="settings-current-pass" required placeholder="Enter current master password">
+              </div>
+              <div class="form-group">
+                <label for="settings-new-pass">New Master Password</label>
+                <input type="password" id="settings-new-pass" required placeholder="Min 8 characters" minlength="8">
+              </div>
+              <div class="form-group">
+                <label for="settings-confirm-pass">Confirm New Master Password</label>
+                <input type="password" id="settings-confirm-pass" required placeholder="Confirm new password" minlength="8">
+              </div>
+              <button type="submit" class="btn btn-outline">Update Master Password</button>
+            </form>
+          </div>
+
+          <div class="settings-section">
+            <h3>Application Config</h3>
+            <div class="form-group">
+              <label for="settings-clipboard-timeout">Auto-Clear Clipboard Timeout</label>
+              <select id="settings-clipboard-timeout" class="select-input">
+                <option value="15">15 Seconds</option>
+                <option value="30" selected>30 Seconds</option>
+                <option value="60">1 Minute</option>
+                <option value="120">2 Minutes</option>
+                <option value="0">Never Clear</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-section danger-section">
+            <h3>Danger Zone</h3>
+            <p class="danger-desc">Deleting your account removes your vault database profile and all encrypted credentials permanently.</p>
+            <button id="btn-wipe-account" class="btn btn-danger">Wipe Account & Vault Profile</button>
+          </div>
+        </div>
+
+        <!-- Security Audit Container -->
+        <div id="audit-content" class="detail-container hidden">
+          <h2>Vault Security Audit</h2>
+          <p class="section-subtitle">Local analysis of your vault credentials strength and duplicate records.</p>
+
+          <div class="audit-summary-card">
+            <div class="audit-score-circle">
+              <span id="audit-score-value">100%</span>
+              <span class="audit-score-label">Vault Health</span>
+            </div>
+            <div class="audit-summary-details">
+              <div class="audit-stat">
+                <span class="audit-stat-num" id="stat-total-items">0</span>
+                <span class="audit-stat-lbl">Total Items</span>
+              </div>
+              <div class="audit-stat danger-text">
+                <span class="audit-stat-num" id="stat-weak-items">0</span>
+                <span class="audit-stat-lbl">Weak Passwords</span>
+              </div>
+              <div class="audit-stat warning-text">
+                <span class="audit-stat-num" id="stat-reused-items">0</span>
+                <span class="audit-stat-lbl">Reused Passwords</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="audit-reports-wrapper">
+            <div class="audit-section-report">
+              <h3>Weak Passwords Report</h3>
+              <div class="audit-list" id="audit-weak-list">
+                <div class="audit-list-empty">No weak passwords found. Nice!</div>
+              </div>
+            </div>
+
+            <div class="audit-section-report">
+              <h3>Reused Passwords Report</h3>
+              <div class="audit-list" id="audit-reused-list">
+                <div class="audit-list-empty">No duplicate passwords found. Great job!</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Absurd Logout Sequence Overlay -->
+  <div id="logout-overlay" class="hidden">
+    <canvas id="logout-canvas"></canvas>
+    
+    <!-- Fancy HUD overlay -->
+    <div class="hud-container" id="hud-card">
+      <div class="hud-header">
+        <div class="hud-scanner-line"></div>
+        <span class="hud-tag">VAULT DESTRUCTION IN PROGRESS</span>
+        <span class="hud-status-badge" id="hud-security-status">SECURE LOCKDOWN</span>
+      </div>
+      
+      <div class="hud-progress-circle-wrapper">
+        <svg class="progress-ring" width="140" height="140">
+          <circle class="progress-ring__background" stroke="rgba(255, 255, 255, 0.05)" stroke-width="8" fill="transparent" r="58" cx="70" cy="70"/>
+          <circle class="progress-ring__circle" id="hud-progress-ring-bar" stroke="#ef4444" stroke-width="8" fill="transparent" r="58" cx="70" cy="70"/>
+        </svg>
+        <div class="progress-percentage" id="hud-percentage">0%</div>
+      </div>
+
+      <div class="hud-main-status" id="hud-main-status">INITIATING REVOCATION</div>
+      <div class="hud-sub-status" id="hud-sub-status">Preparing memory wipe sequence...</div>
+      
+      <!-- Sleek mini progress bar -->
+      <div class="hud-progress-wrapper">
+        <div class="hud-progress-bar" id="hud-progress-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

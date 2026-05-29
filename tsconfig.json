@@ -3,8 +3,10 @@
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "module": "commonjs",
-        "target": "ES5",
-        "outDir": "ts-built",
-        "rootDir": "src"
+        "target": "ES6",
+        "outDir": "dist",
+        "rootDir": "src",
+        "esModuleInterop": true,
+        "skipLibCheck": true
     }
 }
